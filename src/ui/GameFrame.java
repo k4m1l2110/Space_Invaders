@@ -1,17 +1,17 @@
+package ui;
+
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.stream.Collectors;
 
 public class GameFrame extends JFrame {
     private GamePanel gamePanel;
     private JMenuBar menuBar;
     private JMenuItem rules, icon, pause, replay;
 
-    public GameFrame(Menu menu) {
+    public GameFrame() {
         String nickname = JOptionPane.showInputDialog("Enter your nickname:");
-        gamePanel = new GamePanel(nickname, menu);
+        gamePanel = new GamePanel(nickname, this);
         add(gamePanel);
         setTitle("Space Invaders");
         setDefaultCloseOperation(EXIT_ON_CLOSE);

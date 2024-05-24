@@ -1,15 +1,14 @@
+package objects;
+
 import java.awt.*;
 
-public class Bullet {
+public class Bullet extends Entity{
     private int x, y;
 
-    public Bullet(int x, int y) {
+    public Bullet(int x, int y, int vel) {
+        super(x, y, vel, "res/bullet/lvl1", new Point(0, -1));
         this.x = x;
         this.y = y;
-    }
-
-    public void draw(Graphics g) {
-        g.fillRect(x, y, 5, 5);
     }
 
     public Rectangle getBounds() {
@@ -17,6 +16,6 @@ public class Bullet {
     }
 
     public void move() {
-        y--;
+        moveUp();
     }
 }

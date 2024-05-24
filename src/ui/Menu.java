@@ -1,3 +1,5 @@
+package ui;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -27,8 +29,9 @@ public class Menu extends JFrame {
         start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                new GameFrame();
                 setVisible(false);
-                new GameFrame(Menu.this);
+                dispose();
             }
         });
 
@@ -61,9 +64,4 @@ public class Menu extends JFrame {
 
         setVisible(true);
     }
-
-    public void showMenu(){
-        setVisible(true);
-    }
-
 }

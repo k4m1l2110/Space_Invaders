@@ -1,18 +1,16 @@
+package objects;
+
 import java.awt.*;
 
-class Alien extends Entity {
+public class Alien extends Entity {
 
 
     public Alien(int x, int y) {
-        super(x, y, 3);
-    }
-
-    public void draw(Graphics g) {
-        g.fillRect(x, y, 20, 20);
+        super(x, y, 3,"res/alien/lvl1", new Point(0, 1));
     }
 
     public void move() {
-        y+=vel;
+        super.moveDown();
     }
 
     public Rectangle getBounds() {
