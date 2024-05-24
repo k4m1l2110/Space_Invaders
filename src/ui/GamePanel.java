@@ -55,7 +55,7 @@ class GamePanel extends JPanel implements KeyListener {
             }
         });
 
-        alienSpawnTimer.start();
+         alienSpawnTimer.start();
 
         JButton moveLeftButton = new JButton("Move Left");
 
@@ -103,15 +103,16 @@ class GamePanel extends JPanel implements KeyListener {
         if ( keysPressed.contains(KeyEvent.VK_SPACE) ) {
                 player.shoot();
         }
-        for (Alien alien : aliens) {
-            alien.move();
-        }
+//        for (Alien alien : aliens) {
+//            alien.move();
+//        }
         for (Bullet bullet : player.getBullets()) {
             bullet.move();
         }
         for (Bullet bullet : new ArrayList<>(player.getBullets())) {
             for (Alien alien : new ArrayList<>(aliens)) {
-                if (bullet.isColliding(alien)) {
+                bullet.detectCollision(alien);
+                if (bullet.collision != null) {
                     player.getBullets().remove(bullet);
                     aliens.remove(alien);
                     score++;
@@ -120,8 +121,9 @@ class GamePanel extends JPanel implements KeyListener {
             }
         }
         for (Alien alien : new ArrayList<>(aliens)) {
-            if (alien.isColliding(player)) {
-                gameOver();
+            player.detectCollision(alien);
+            if (player.collision != null) {
+                //gameOver();
                 break;
             }
         }

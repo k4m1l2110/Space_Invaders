@@ -3,6 +3,7 @@ package objects;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -10,9 +11,10 @@ import java.io.IOException;
 public class Entity {
     protected int x, y, vel;
     protected double angle;
-    protected Image texture;
+    protected BufferedImage texture;
     protected Rectangle bounds;
     protected Point delta;
+    public Rectangle collision;
 
     public Entity(int x, int y, int initVel, String path, Point delta) {
         this.x = x;
@@ -24,7 +26,7 @@ public class Entity {
         updateBounds();
     }
 
-    private Image loadTextures(String path) {
+    private BufferedImage loadTextures(String path) {
     File folder = new File(path);
     File[] listOfFiles = folder.listFiles();
     BufferedImage combined = null;
@@ -33,7 +35,7 @@ public class Entity {
         int width = 0;
         int height = 0;
         for (File file : listOfFiles) {
-            if (file.isFile() && (file.getName().endsWith(".png") || file.getName().endsWith(".jpg"))) {
+            if (file.isFile() && file.getName().endsWith(".png")) {
                 try {
                     BufferedImage image = ImageIO.read(file);
                     width = Math.max(width, image.getWidth());
@@ -87,30 +89,32 @@ public class Entity {
             bounds.y = 600 - bounds.height;
             delta.y *= -1;
         }
+
+        updateBounds();
     }
 
     public void moveLeft() {
         x -= vel;
+        bounds.x = x;
         angle = Math.toRadians(-90);
-        updateBounds();
     }
 
     public void moveRight() {
         x += vel;
+        bounds.x = x;
         angle = Math.toRadians(90);
-        updateBounds();
     }
 
     public void moveUp() {
         y -= vel;
+        bounds.y = y;
         angle = 0.0;
-        updateBounds();
     }
 
     public void moveDown() {
         y += vel;
+        bounds.y = y;
         angle = Math.toRadians(180);
-        updateBounds();
     }
 
     public void moveUpRight() {
@@ -127,23 +131,49 @@ public class Entity {
         if (texture != null) {
             g2d.drawImage(texture, x, y, null);
         }
+
+        if (collision != null) {
+            g2d.setColor(new Color(255, 0, 0, 128));
+            g2d.fill(collision);
+        }
+
+        g2d.setColor(Color.RED);
+        g2d.draw(bounds);
         g2d.setTransform(old);
     }
 
-    public boolean isColliding(Entity other) {
-        Rectangle intersection = this.bounds.intersection(other.bounds);
+    protected Rectangle getCollision(Rectangle rect1, Rectangle rect2) {
+        Area a1 = new Area(rect1);
+        Area a2 = new Area(rect2);
+        a1.intersect(a2);
+        return a1.getBounds();
+    }
 
-        for (int x = intersection.x; x < intersection.x + intersection.width; x++) {
-            for (int y = intersection.y; y < intersection.y + intersection.height; y++) {
-                int thisColor = ((BufferedImage) this.texture).getRGB(x - this.bounds.x, y - this.bounds.y);
-                int otherColor = ((BufferedImage) other.texture).getRGB(x - other.bounds.x, y - other.bounds.y);
+    public boolean collision(int x, int y, Entity other) {
+        boolean collision = false;
+        int spiderPixel = texture.getRGB(x - bounds.x, y - bounds.y);
+        int flyPixel = other.texture.getRGB(x - other.bounds.x, y - other.bounds.y);
+        if (((spiderPixel >> 24) & 0xFF) < 255 && ((flyPixel >> 24) & 0xFF) < 255) {
+            collision = true;
+        }
+        return collision;
+    }
 
-                if ((thisColor >>> 24) != 0 && (otherColor >>> 24) != 0) {
-                    return true;
+    public void detectCollision(Entity other) {
+        collision = null;
+        if (bounds.intersects(other.bounds)) {
+            Rectangle cbounds = getCollision(bounds, other.bounds);
+            if (!cbounds.isEmpty()) {
+                for (int x = cbounds.x; x < cbounds.x + cbounds.width; x++) {
+                    for (int y = cbounds.y; y < cbounds.y + cbounds.height; y++) {
+                        if (collision(x, y, other)) {
+                            collision = cbounds;
+                            break;
+                        }
+                    }
                 }
             }
         }
-
-        return false;
     }
+
 }
