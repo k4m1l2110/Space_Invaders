@@ -5,10 +5,7 @@ import objects.Bullet;
 import objects.Player;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,16 +18,23 @@ class GamePanel extends JPanel implements KeyListener {
     private Player player;
     private List<Point> stars;
     private List<Alien> aliens;
-    private Timer gameTimer;
-    private Timer alienSpawnTimer;
+    private Timer gameTimer, alienSpawnTimer;
     private Set<Integer> keysPressed;
     private GameFrame gameFrame;
+    private int cursorX = 0, cursorY = 0, difficultyLevel = 8, score = 0;
 
-    int difficultyLevel = 8, score = 0;
     public GamePanel(String nickname, GameFrame gameFrame) {
         this.gameFrame = gameFrame;
         player = new Player(nickname,200, 350, 5);
         aliens = new ArrayList<>();
+
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                cursorX = e.getX();
+                cursorY = e.getY();
+            }
+        });
 
         keysPressed = new HashSet<>();
         setFocusable(true);
@@ -45,10 +49,9 @@ class GamePanel extends JPanel implements KeyListener {
         });
         gameTimer.start();
 
-        alienSpawnTimer = new Timer(2000, new ActionListener() {
+        alienSpawnTimer = new Timer(4000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Spawn a new line of aliens every 2 seconds
                 for (int i = 0; i < difficultyLevel; i++) {
                     aliens.add(new Alien(i * 100, 50));
                 }
@@ -56,6 +59,7 @@ class GamePanel extends JPanel implements KeyListener {
         });
 
          alienSpawnTimer.start();
+
 
         JButton moveLeftButton = new JButton("Move Left");
 
@@ -88,6 +92,7 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void updateGameState() {
+        // Step 1: Update positions
         if ( keysPressed.contains(KeyEvent.VK_LEFT) ) {
             player.moveLeft();
         }
@@ -101,34 +106,40 @@ class GamePanel extends JPanel implements KeyListener {
             player.moveDown();
         }
         if ( keysPressed.contains(KeyEvent.VK_SPACE) ) {
-                player.shoot();
+            player.shoot();
         }
-//        for (Alien alien : aliens) {
-//            alien.move();
-//        }
+
+        aliens.forEach(Alien::move);
+        player.getBullets().forEach(Bullet::move);
+
+        List<Bullet> bulletsToRemove = new ArrayList<>();
+        List<Alien> aliensToRemove = new ArrayList<>();
         for (Bullet bullet : player.getBullets()) {
-            bullet.move();
-        }
-        for (Bullet bullet : new ArrayList<>(player.getBullets())) {
-            for (Alien alien : new ArrayList<>(aliens)) {
-                bullet.detectCollision(alien);
-                if (bullet.collision != null) {
-                    player.getBullets().remove(bullet);
-                    aliens.remove(alien);
-                    score++;
-                    break;
+            for (Alien alien : aliens) {
+                if (bullet.detectCollision(alien)) {
+                    bulletsToRemove.add(bullet);
+                    alien.getHurts();
+                    score += 10;
+                }
+                if (alien.getHealth() <= 0) {
+                    aliensToRemove.add(alien);
                 }
             }
         }
-        for (Alien alien : new ArrayList<>(aliens)) {
-            player.detectCollision(alien);
-            if (player.collision != null) {
-                //gameOver();
-                break;
+
+        for(Alien alien : aliens) {
+            if(alien.detectCollision(player)) {
+                player.getHurts();
+                aliensToRemove.add(alien);
             }
         }
-        aliens.stream().forEach(Alien::move);
-        player.getBullets().stream().forEach(Bullet::move);
+
+        if(player.getHealth() <= 0) {
+            gameOver();
+        }
+
+        player.getBullets().removeAll(bulletsToRemove);
+        aliens.removeAll(aliensToRemove);
 
     }
 
@@ -182,6 +193,9 @@ class GamePanel extends JPanel implements KeyListener {
         for (Bullet bullet : player.getBullets()) {
             bullet.draw(g);
         }
+
+        g.setColor(Color.WHITE);
+        g.drawString("Cursor X: " + cursorX + ", Y: " + cursorY, 10, 30);
     }
 
     @Override
