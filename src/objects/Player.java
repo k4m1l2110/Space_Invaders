@@ -4,14 +4,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Map;
 
 import static java.lang.Thread.sleep;
 
+
 public class Player extends Entity {
     String nickname;
-    int health = 100, maxHealth = 100;
+    int health = 100, maxHealth = 100, armor = 0, speed = 5, agility = 5, strength = 5;
     private ArrayList<Bullet> bullets = new ArrayList<>();
+
 
     public Player(String nickname, int x, int y, int initVel) {
         super(x, y, initVel, "res/player/lvl1", new Point(0, 0));
@@ -26,6 +30,9 @@ public class Player extends Entity {
             shootDelayTimer.stop();
         }
     });
+
+
+
 
     public void shoot() {
         if (canShoot) {
@@ -64,6 +71,32 @@ public void draw(Graphics g) {
         g.fillRect(x, y - 20, (int)(((double)health / maxHealth) * boundingRectangle.width), 5);
 
 }
+
+@Override
+    public void moveLeft(){
+        angle -= Math.toRadians(agility);
+        super.updateBoundingRectangle();
+    }
+
+    @Override
+    public void moveRight(){
+        angle += Math.toRadians(agility);
+        super.updateBoundingRectangle();
+    }
+
+    @Override
+    public void moveUp(){
+        x += speed * Math.cos(angle - Math.PI /2);
+        y += speed * Math.sin(angle - Math.PI /2);
+        super.updateBoundingRectangle();
+    }
+
+    @Override
+    public void moveDown(){
+        x -= speed * Math.cos(angle - Math.PI /2);
+        y -= speed * Math.sin(angle - Math.PI /2);
+        super.updateBoundingRectangle();
+    }
 
 }
 
