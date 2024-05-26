@@ -2,6 +2,7 @@ package ui;
 
 import objects.Alien;
 import objects.Bullet;
+import objects.Entity;
 import objects.Player;
 
 import javax.swing.*;
@@ -52,8 +53,20 @@ class GamePanel extends JPanel implements KeyListener {
         alienSpawnTimer = new Timer(4000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (int i = 0; i < difficultyLevel; i++) {
-                    aliens.add(new Alien(i * 100, 50));
+                for (int i = 0; i < difficultyLevel*1.5; i++) {
+                    aliens.add(new Alien(i * 100, 50, new Alien.Move() {
+                        @Override
+                        public void move(Entity entity) {
+                            java.util.Random random = new java.util.Random();
+                            boolean moveRight = random.nextDouble() < 0.9;
+                            if (moveRight) {
+                                entity.moveRight();
+                            } else {
+                                entity.moveLeft();
+                            }
+                            entity.moveDown();
+                        }
+                    }));
                 }
             }
         });
@@ -92,7 +105,9 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void updateGameState() {
-        // Step 1: Update positions
+
+        difficultyLevel = (score/1000)+1;
+
         if ( keysPressed.contains(KeyEvent.VK_LEFT) ) {
             player.moveLeft();
         }
