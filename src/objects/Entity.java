@@ -119,11 +119,9 @@ public class Entity {
         Graphics2D g2d = (Graphics2D) g;
         AffineTransform old = g2d.getTransform();
 
-        // Calculate the center of the image
         int centerX = x + texture.getWidth() / 2;
         int centerY = y + texture.getHeight() / 2;
 
-        // Rotate the image around its center
         g2d.rotate(angle, centerX, centerY);
 
         if (texture != null) {

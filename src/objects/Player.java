@@ -17,10 +17,8 @@ public class Player extends Entity {
         super(x, y, initVel, "res/player/lvl1", new Point(0, 0));
         this.nickname = nickname;
     }
-    // Add a boolean to track if the player can shoot
     private boolean canShoot = true;
 
-    // Add a Timer that will be started when the player shoots
     private Timer shootDelayTimer = new Timer(100, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -30,12 +28,10 @@ public class Player extends Entity {
     });
 
     public void shoot() {
-        // Only shoot if canShoot is true
         if (canShoot) {
             Bullet bullet = new Bullet(x, y, 5, angle);
             bullets.add(bullet);
 
-            // Disable shooting and start the timer
             canShoot = false;
             shootDelayTimer.start();
         }
