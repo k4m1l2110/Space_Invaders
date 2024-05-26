@@ -2,16 +2,26 @@ package objects;
 
 import java.awt.*;
 
+
+
 public class Alien extends Entity {
     int health, maxHealth = 10;
 
-    public Alien(int x, int y) {
+    int armor=0;
+    public interface Move {
+        void move(Entity entity);
+    }
+    protected Move move;
+
+    public Alien(int x, int y,Move moveOperation) {
         super(x, y, 1 ,"res/alien/lvl1", new Point(0, 1));
         this.health = 10;
+        this.move=moveOperation;
+
     }
 
     public void move() {
-        super.moveDown();
+        move.move(this);
     }
 
     public void getHurts() {
