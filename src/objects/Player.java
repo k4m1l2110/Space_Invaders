@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 import static java.lang.Thread.sleep;
@@ -18,9 +19,26 @@ public class Player extends Entity {
 
 
     public Player(String nickname, int x, int y, int initVel) {
-        super(x, y, initVel, "res/player/lvl1", new Point(0, 0));
+        super(x, y, initVel, new ArrayList<>(Arrays.asList(
+                new Component(
+                        "res/player/lvl1/body.png", Map.of(
+                        "health", 100,
+                        "armor", 0,
+                        "speed", 5,
+                        "agility", 5,
+                        "strength", 5)),
+                new Component(
+                        "res/player/lvl1/wing.png", Map.of(
+                        "health", 100,
+                        "armor", 0,
+                        "speed", 5,
+                        "agility", 5,
+                        "strength", 5))
+
+        )), new Point(0, 0));
         this.nickname = nickname;
     }
+
     private boolean canShoot = true;
 
     private Timer shootDelayTimer = new Timer(100, new ActionListener() {

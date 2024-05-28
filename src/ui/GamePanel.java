@@ -2,17 +2,16 @@ package ui;
 
 import objects.Alien;
 import objects.Bullet;
+import objects.Component;
 import objects.Entity;
 import objects.Player;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.awt.*;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 
 class GamePanel extends JPanel implements KeyListener {
@@ -23,6 +22,7 @@ class GamePanel extends JPanel implements KeyListener {
     private Set<Integer> keysPressed;
     private GameFrame gameFrame;
     private int cursorX = 0, cursorY = 0, difficultyLevel = 8, score = 0;
+    ArrayList<Component> components = new ArrayList<>();
 
     public GamePanel(String nickname, GameFrame gameFrame) {
         this.gameFrame = gameFrame;
@@ -36,6 +36,23 @@ class GamePanel extends JPanel implements KeyListener {
                 cursorY = e.getY();
             }
         });
+
+        components.add(new Component(
+                "res/alien/lvl1/body.png", Map.of(
+                "health", 10,
+                "armor", 0,
+                "speed", 5,
+                "agility", 5,
+                "strength", 5)
+        ));
+        components.add(new Component(
+                "res/alien/lvl1/wing.png", Map.of(
+                "health", 10,
+                "armor", 0,
+                "speed", 5,
+                "agility", 5,
+                "strength", 5)
+        ));
 
         keysPressed = new HashSet<>();
         setFocusable(true);
@@ -51,25 +68,27 @@ class GamePanel extends JPanel implements KeyListener {
         gameTimer.start();
 
         alienSpawnTimer = new Timer(4000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for (int i = 0; i < difficultyLevel*1.5; i++) {
-                    aliens.add(new Alien(i * 100, 50, new Alien.Move() {
-                        @Override
-                        public void move(Entity entity) {
-                            java.util.Random random = new java.util.Random();
-                            boolean moveRight = random.nextDouble() < 0.9;
-                            if (moveRight) {
-                                entity.moveRight();
-                            } else {
-                                entity.moveLeft();
-                            }
-                            entity.moveDown();
-                        }
-                    }));
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        for (int i = 0; i < difficultyLevel*1.5; i++) {
+
+
+            aliens.add(new Alien(i * 100, 50, new Alien.Move() {
+                @Override
+                public void move(Entity entity) {
+                    java.util.Random random = new java.util.Random();
+                    boolean moveRight = random.nextDouble() < 0.4;
+                    if (moveRight) {
+                        entity.moveRight();
+                    } else {
+                        entity.moveLeft();
+                    }
+                    entity.moveDown();
                 }
-            }
-        });
+            }, components));
+        }
+    }
+    });
 
          alienSpawnTimer.start();
 

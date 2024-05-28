@@ -31,7 +31,6 @@ public class Entity {
 
 
     private BufferedImage loadTextures() {
-        // Determine the maximum width and height among all components
         int maxWidth = 0;
         int maxHeight = 0;
         for (Component component : components) {
@@ -40,11 +39,9 @@ public class Entity {
             maxHeight = Math.max(maxHeight, texture.getHeight(null));
         }
 
-        // Create a new image with the maximum width and height
         BufferedImage combined = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics g = combined.getGraphics();
 
-        // Draw each component's texture onto the combined image
         for (Component component : components) {
             Image texture = component.getTexture();
             g.drawImage(texture, 0, 0, null);
