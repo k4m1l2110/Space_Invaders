@@ -14,24 +14,23 @@ import static java.lang.Thread.sleep;
 
 public class Player extends Entity {
     String nickname;
-    int health = 100, maxHealth = 100, armor = 0, speed = 5, agility = 5, strength = 5;
     private ArrayList<Bullet> bullets = new ArrayList<>();
 
 
     public Player(String nickname, int x, int y, int initVel) {
         super(x, y, initVel, new ArrayList<>(Arrays.asList(
                 new Component(
-                        "res/player/lvl1/body.png", Map.of(
-                        "health", 100,
+                        "res/player/lvl1/basic/body.png", Map.of(
+                        "health", 20,
                         "armor", 0,
-                        "speed", 5,
+                        "speed", 2,
                         "agility", 5,
                         "strength", 5)),
                 new Component(
-                        "res/player/lvl1/wing.png", Map.of(
-                        "health", 100,
+                        "res/player/lvl1/basic/wing.png", Map.of(
+                        "health", 20,
                         "armor", 0,
-                        "speed", 5,
+                        "speed", 2,
                         "agility", 5,
                         "strength", 5))
 
@@ -104,15 +103,15 @@ public void draw(Graphics g) {
 
     @Override
     public void moveUp(){
-        x += speed * Math.cos(angle - Math.PI /2);
-        y += speed * Math.sin(angle - Math.PI /2);
+        x += vel * Math.cos(angle - Math.PI /2);
+        y += vel * Math.sin(angle - Math.PI /2);
         super.updateBoundingRectangle();
     }
 
     @Override
     public void moveDown(){
-        x -= speed * Math.cos(angle - Math.PI /2);
-        y -= speed * Math.sin(angle - Math.PI /2);
+        x -= vel * Math.cos(angle - Math.PI /2);
+        y -= vel * Math.sin(angle - Math.PI /2);
         super.updateBoundingRectangle();
     }
 

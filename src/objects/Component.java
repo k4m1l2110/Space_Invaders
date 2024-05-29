@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class Component {
     private Image texture;
-    private Map<String, Integer> stats;
+    public Map<String, Integer> stats;
     public Component(String path,Map<String, Integer> stats) {
         Image texture = null;
         try {

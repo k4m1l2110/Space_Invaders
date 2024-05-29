@@ -1,10 +1,7 @@
 package ui;
 
-import objects.Alien;
-import objects.Bullet;
+import objects.*;
 import objects.Component;
-import objects.Entity;
-import objects.Player;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -17,9 +14,9 @@ import java.util.List;
 class GamePanel extends JPanel implements KeyListener {
     private Player player;
     private List<Point> stars;
-    private List<Alien> aliens;
     private Timer gameTimer, alienSpawnTimer;
     private Set<Integer> keysPressed;
+    private AlienSpawner alienSpawner;
     private GameFrame gameFrame;
     private int cursorX = 0, cursorY = 0, difficultyLevel = 8, score = 0;
     ArrayList<Component> components = new ArrayList<>();
@@ -27,7 +24,6 @@ class GamePanel extends JPanel implements KeyListener {
     public GamePanel(String nickname, GameFrame gameFrame) {
         this.gameFrame = gameFrame;
         player = new Player(nickname,200, 350, 5);
-        aliens = new ArrayList<>();
 
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -36,23 +32,6 @@ class GamePanel extends JPanel implements KeyListener {
                 cursorY = e.getY();
             }
         });
-
-        components.add(new Component(
-                "res/alien/lvl1/body.png", Map.of(
-                "health", 10,
-                "armor", 0,
-                "speed", 5,
-                "agility", 5,
-                "strength", 5)
-        ));
-        components.add(new Component(
-                "res/alien/lvl1/wing.png", Map.of(
-                "health", 10,
-                "armor", 0,
-                "speed", 5,
-                "agility", 5,
-                "strength", 5)
-        ));
 
         keysPressed = new HashSet<>();
         setFocusable(true);
@@ -67,31 +46,16 @@ class GamePanel extends JPanel implements KeyListener {
         });
         gameTimer.start();
 
-        alienSpawnTimer = new Timer(4000, new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        for (int i = 0; i < difficultyLevel*1.5; i++) {
+        alienSpawner = new AlienSpawner();
 
+        alienSpawnTimer = new Timer(5000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                alienSpawner.spawnWave(score);
+            }
+        });
 
-            aliens.add(new Alien(i * 100, 50, new Alien.Move() {
-                @Override
-                public void move(Entity entity) {
-                    java.util.Random random = new java.util.Random();
-                    boolean moveRight = random.nextDouble() < 0.4;
-                    if (moveRight) {
-                        entity.moveRight();
-                    } else {
-                        entity.moveLeft();
-                    }
-                    entity.moveDown();
-                }
-            }, components));
-        }
-    }
-    });
-
-         alienSpawnTimer.start();
-
+        alienSpawnTimer.start();
 
         JButton moveLeftButton = new JButton("Move Left");
 
@@ -123,6 +87,10 @@ class GamePanel extends JPanel implements KeyListener {
         add(shootButton);
     }
 
+    void spawnWave(){
+
+    }
+
     private void updateGameState() {
 
         difficultyLevel = (score/1000)+1;
@@ -143,13 +111,13 @@ class GamePanel extends JPanel implements KeyListener {
             player.shoot();
         }
 
-        aliens.forEach(Alien::move);
+        alienSpawner.getAliens().forEach(alien -> alien.move(player));
         player.getBullets().forEach(Bullet::move);
 
         List<Bullet> bulletsToRemove = new ArrayList<>();
         List<Alien> aliensToRemove = new ArrayList<>();
         for (Bullet bullet : player.getBullets()) {
-            for (Alien alien : aliens) {
+            for (Alien alien : alienSpawner.getAliens()) {
                 if (bullet.detectCollision(alien)) {
                     bulletsToRemove.add(bullet);
                     alien.getHurts();
@@ -161,9 +129,12 @@ class GamePanel extends JPanel implements KeyListener {
             }
         }
 
-        for(Alien alien : aliens) {
+        for(Alien alien : alienSpawner.getAliens()) {
             if(alien.detectCollision(player)) {
                 player.getHurts();
+                aliensToRemove.add(alien);
+            }
+            if(alien.getX() > 800 || alien.getY() > 800) {
                 aliensToRemove.add(alien);
             }
         }
@@ -173,7 +144,7 @@ class GamePanel extends JPanel implements KeyListener {
         }
 
         player.getBullets().removeAll(bulletsToRemove);
-        aliens.removeAll(aliensToRemove);
+        alienSpawner.getAliens().removeAll(aliensToRemove);
 
     }
 
@@ -221,7 +192,7 @@ class GamePanel extends JPanel implements KeyListener {
 
         g.drawString("Score: " + score, 10, 20);
         player.draw(g);
-        for (Alien alien : aliens) {
+        for (Alien alien : alienSpawner.getAliens()) {
             alien.draw(g);
         }
         for (Bullet bullet : player.getBullets()) {

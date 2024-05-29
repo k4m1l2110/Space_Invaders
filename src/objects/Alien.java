@@ -5,11 +5,12 @@ import java.util.ArrayList;
 
 
 public class Alien extends Entity {
-    int health, maxHealth = 10;
+
 
     public interface Move {
         void move(Entity entity);
     }
+
     protected Move move;
 
     public Alien(int x, int y, Move moveOperation, ArrayList<Component> components) {
@@ -21,6 +22,27 @@ public class Alien extends Entity {
 
     public void move() {
         move.move(this);
+    }
+
+    public void move(Entity target){
+        moveTowards(target);
+    }
+
+    public void moveTowards(Entity target) {
+        int dx = target.getX() - this.getX();
+        int dy = target.getY() - this.getY();
+
+        if (dx > 0) {
+            moveRight();
+        } else if (dx < 0) {
+            moveLeft();
+        }
+
+        if (dy > 0) {
+            moveDown();
+        } else if (dy < 0) {
+            moveUp();
+        }
     }
 
     public void getHurts() {

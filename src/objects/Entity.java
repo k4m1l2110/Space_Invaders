@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 public class Entity {
     protected int x, y, vel;
+    int health, maxHealth = 10, agility;
     protected double angle;
     protected BufferedImage texture;
     private ArrayList<Component> components;
@@ -23,21 +24,26 @@ public class Entity {
         this.vel = initVel;
         this.angle = 0.0;
         this.components = components;
-        this.texture = loadTextures();
+        this.texture = loadComponents();
+        health=maxHealth;
         //changecolor(texture, 200);
         this.boundingRectangle = calculateBoundingRectangle();
 
     }
 
 
-    private BufferedImage loadTextures() {
+    private BufferedImage loadComponents() {
         int maxWidth = 0;
         int maxHeight = 0;
         for (Component component : components) {
             Image texture = component.getTexture();
+            maxHealth+=component.stats.get("health");
+            vel+=component.stats.get("speed");
+            agility+=component.stats.get("agility");
             maxWidth = Math.max(maxWidth, texture.getWidth(null));
             maxHeight = Math.max(maxHeight, texture.getHeight(null));
         }
+
 
         BufferedImage combined = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics g = combined.getGraphics();
