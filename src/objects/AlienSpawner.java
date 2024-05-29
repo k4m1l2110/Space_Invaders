@@ -19,6 +19,28 @@ public class AlienSpawner{
     public AlienSpawner() {
     }
 
+    private Alien spawnAlien(){
+
+        Alien result = new Alien(0, 0, entity -> entity.moveDown(), new ArrayList<>(Arrays.asList(
+            new Component(
+                "res/alien/lvl1/basic/body.png", Map.of(
+                "health", 100,
+                "armor", 0,
+                "speed", 1,
+                "agility", 5,
+                "strength", 5)),
+            new Component(
+                "res/alien/lvl1/basic/wing.png", Map.of(
+                "health", 100,
+                "armor", 0,
+                "speed", 1,
+                "agility", 5,
+                "strength", 5))
+        )), true);
+
+        return result;
+    }
+
     public void spawnWave(int score) {
 
         int numAliens = score/100 + getRandomNumber(1,5);
@@ -26,12 +48,15 @@ public class AlienSpawner{
 
             String type="basic";
 
-            switch(getRandomNumber(0, 2)){
+            switch(getRandomNumber(0, 3)){
                 case 0:
                     type="basic";
                     break;
                 case 1:
                     type="health";
+                    break;
+                case 2:
+                    type="damage";
                     break;
                 default:
                     break;
@@ -52,7 +77,9 @@ public class AlienSpawner{
                     "speed", 1,
                     "agility", 5,
                     "strength", 5))
-            ))));
+            ))
+            , true
+            ));
 
         }
 

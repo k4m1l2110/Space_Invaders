@@ -48,9 +48,6 @@ public class Player extends Entity {
         }
     });
 
-
-
-
     public void shoot() {
         if (canShoot) {
             Bullet bullet = new Bullet(x, y, 5, angle);

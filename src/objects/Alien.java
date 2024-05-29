@@ -12,12 +12,13 @@ public class Alien extends Entity {
     }
 
     protected Move move;
+    protected boolean sentient = false;
 
-    public Alien(int x, int y, Move moveOperation, ArrayList<Component> components) {
+    public Alien(int x, int y, Move moveOperation, ArrayList<Component> components, boolean sentient) {
         super(x, y, 1 ,components, new Point(0, 1));
         this.health = 10;
         this.move=moveOperation;
-
+        this.sentient = sentient;
     }
 
     public void move() {
