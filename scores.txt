@@ -1,0 +1,4 @@
+Nickname: , Score: 0
+Nickname: fdf, Score: 13
+Nickname: dsdas, Score: 0
+Nickname: sdasd, Score: 0

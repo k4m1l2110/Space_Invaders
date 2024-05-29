@@ -9,29 +9,37 @@ import java.util.Map;
 public class AlienSpawner{
 
     private ArrayList<Alien> aliens = new ArrayList<>();
-    private int score;
-    private int waveLength = 5;
+    private int score, gm, waveLength = 5, difficultyLevel;
 
     int getRandomNumber(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);
     }
 
-    public AlienSpawner() {
+    public AlienSpawner(int gm, int difficulty) {
+        this.gm = gm;
+        this.difficultyLevel = difficulty;
     }
 
-    private Alien spawnAlien(){
+    private Alien spawnAlien(String type, int x, int y) {
 
-        Alien result = new Alien(0, 0, entity -> entity.moveDown(), new ArrayList<>(Arrays.asList(
+        Alien result = new Alien(x, y, entity -> {
+            entity.moveDown();
+            entity.moveRight();
+            entity.moveRight();
+            entity.moveDown();
+            entity.moveLeft();
+            entity.moveLeft();
+        }, new ArrayList<>(Arrays.asList(
             new Component(
-                "res/alien/lvl1/basic/body.png", Map.of(
-                "health", 100,
+                "res/alien/lvl1/"+type+"/body.png", Map.of(
+                "health", 20,
                 "armor", 0,
                 "speed", 1,
                 "agility", 5,
                 "strength", 5)),
             new Component(
-                "res/alien/lvl1/basic/wing.png", Map.of(
-                "health", 100,
+                "res/alien/lvl1/"+type+"/wing.png", Map.of(
+                "health", 20,
                 "armor", 0,
                 "speed", 1,
                 "agility", 5,
@@ -43,8 +51,12 @@ public class AlienSpawner{
 
     public void spawnWave(int score) {
 
-        int numAliens = score/100 + getRandomNumber(1,5);
-        for (int i = 0; i < numAliens; i++) {
+        System.out.println(difficultyLevel);
+
+        //Zad pp4
+        int numAliens = (getRandomNumber(1,score/1000 +2)) *difficultyLevel;
+        System.out.println("Spawning wave of "+numAliens+" aliens");
+        for (int i = 0; i < numAliens+1; i++) {
 
             String type="basic";
 
@@ -62,24 +74,7 @@ public class AlienSpawner{
                     break;
             }
 
-            aliens.add(new Alien(i*100, 0, entity -> entity.moveDown(), new ArrayList<>(Arrays.asList(
-                new Component(
-                    "res/alien/lvl1/"+type+"/body.png", Map.of(
-                    "health", 100,
-                    "armor", 0,
-                    "speed", 1,
-                    "agility", 5,
-                    "strength", 5)),
-                new Component(
-                    "res/alien/lvl1/"+type+"/wing.png", Map.of(
-                    "health", 100,
-                    "armor", 0,
-                    "speed", 1,
-                    "agility", 5,
-                    "strength", 5))
-            ))
-            , true
-            ));
+            aliens.add(spawnAlien(type, 800/numAliens * i, 0));
 
         }
 

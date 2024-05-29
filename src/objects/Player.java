@@ -74,6 +74,10 @@ public class Player extends Entity {
         return health;
     }
 
+    public String getNickname() {
+        return nickname;
+    }
+
     @Override
 public void draw(Graphics g) {
     super.draw(g);
@@ -86,31 +90,39 @@ public void draw(Graphics g) {
 
 }
 
-@Override
+
+    @Override
     public void moveLeft(){
-        angle -= Math.toRadians(agility);
-        super.updateBoundingRectangle();
+        x -= vel;
+        updateBoundingRectangle();
     }
 
     @Override
     public void moveRight(){
+        x += vel;
+        updateBoundingRectangle();
+    }
+
+    public void Left(){
+        angle -= Math.toRadians(agility);
+        super.updateBoundingRectangle();
+    }
+
+    public void Right(){
         angle += Math.toRadians(agility);
         super.updateBoundingRectangle();
     }
 
-    @Override
-    public void moveUp(){
+    public void Up(){
         x += vel * Math.cos(angle - Math.PI /2);
         y += vel * Math.sin(angle - Math.PI /2);
         super.updateBoundingRectangle();
     }
 
-    @Override
-    public void moveDown(){
+    public void Down(){
         x -= vel * Math.cos(angle - Math.PI /2);
         y -= vel * Math.sin(angle - Math.PI /2);
         super.updateBoundingRectangle();
     }
-
 }
 

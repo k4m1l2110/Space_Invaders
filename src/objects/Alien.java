@@ -16,7 +16,6 @@ public class Alien extends Entity {
 
     public Alien(int x, int y, Move moveOperation, ArrayList<Component> components, boolean sentient) {
         super(x, y, 1 ,components, new Point(0, 1));
-        this.health = 10;
         this.move=moveOperation;
         this.sentient = sentient;
     }
@@ -47,11 +46,15 @@ public class Alien extends Entity {
     }
 
     public void getHurts() {
-        health -= 2;
+        health -= 10;
     }
 
     public int getHealth() {
         return health;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
     }
 
     @Override

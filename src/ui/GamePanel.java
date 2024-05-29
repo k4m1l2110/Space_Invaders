@@ -6,6 +6,11 @@ import objects.Component;
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.event.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.awt.*;
 import java.util.List;
@@ -18,20 +23,22 @@ class GamePanel extends JPanel implements KeyListener {
     private Set<Integer> keysPressed;
     private AlienSpawner alienSpawner;
     private GameFrame gameFrame;
+    private int gamemode, difficulty=1, delay =1, maxwaves=1, minscore;
     private int cursorX = 0, cursorY = 0, difficultyLevel = 8, score = 0;
     ArrayList<Component> components = new ArrayList<>();
 
-    public GamePanel(String nickname, GameFrame gameFrame) {
+    public GamePanel(String nickname, GameFrame gameFrame,
+                     int gm, int difficulty, int delay, int maxw, int minscore) {
+
         this.gameFrame = gameFrame;
+        this.gamemode = gm;
+        this.difficulty = difficulty;
+        this.maxwaves = maxw;
+        this.delay = delay;
+        this.minscore = minscore;
+
         player = new Player(nickname,200, 350, 5);
 
-        addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                cursorX = e.getX();
-                cursorY = e.getY();
-            }
-        });
 
         keysPressed = new HashSet<>();
         setFocusable(true);
@@ -46,19 +53,31 @@ class GamePanel extends JPanel implements KeyListener {
         });
         gameTimer.start();
 
-        alienSpawner = new AlienSpawner();
+        alienSpawner = new AlienSpawner(gamemode, this.difficulty);
 
-        alienSpawnTimer = new Timer(5000, new ActionListener() {
+        //Zad pp4
+        alienSpawnTimer = new Timer(this.delay, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                alienSpawner.spawnWave(score);
+                if(gm==0) {
+                    if(maxwaves>0)
+                    alienSpawner.spawnWave(score);
+                    maxwaves--;
+                    //Zad pp6
+                    if (maxwaves <= 0 && alienSpawner.getAliens().isEmpty()) {
+                        gameOver();
+                    }
+                }
+                else{
+                    alienSpawner.spawnWave(score);
+                }
             }
         });
 
         alienSpawnTimer.start();
 
         JButton moveLeftButton = new JButton("Move Left");
-
+        //Zad pp1
         moveLeftButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -74,6 +93,7 @@ class GamePanel extends JPanel implements KeyListener {
             }
         });
 
+        //Zad pp2
         JButton shootButton = new JButton("Shoot");
         shootButton.addActionListener(new ActionListener() {
             @Override
@@ -93,25 +113,43 @@ class GamePanel extends JPanel implements KeyListener {
 
     private void updateGameState() {
 
-        difficultyLevel = (score/1000)+1;
-
+//        if(score>minscore)
+//            JOptionPane.showMessageDialog(this, "Congratulations! Your score is in the top 10!");
+//
+        //Zad pp1
         if ( keysPressed.contains(KeyEvent.VK_LEFT) ) {
-            player.moveLeft();
+            if(gamemode==1)
+                player.Left();
+            else
+                player.moveLeft();
         }
         if ( keysPressed.contains(KeyEvent.VK_RIGHT) ) {
-            player.moveRight();
+            if(gamemode==1)
+                player.Right();
+            else
+                player.moveRight();
         }
         if ( keysPressed.contains(KeyEvent.VK_UP) ) {
-            player.moveUp();
+            if(gamemode==1)
+                player.Up();
+            else
+                player.moveUp();
         }
         if ( keysPressed.contains(KeyEvent.VK_DOWN) ) {
-            player.moveDown();
+            if(gamemode==1)
+                player.Down();
+            else
+                player.moveDown();
         }
+        //Zad pp2
         if ( keysPressed.contains(KeyEvent.VK_SPACE) ) {
             player.shoot();
         }
-
-        alienSpawner.getAliens().forEach(alien -> alien.move(player));
+        if(gamemode==0)
+            alienSpawner.getAliens().forEach(alien -> alien.move());
+        else {
+            alienSpawner.getAliens().forEach(alien -> alien.move());
+        }
         player.getBullets().forEach(Bullet::move);
 
         List<Bullet> bulletsToRemove = new ArrayList<>();
@@ -121,9 +159,10 @@ class GamePanel extends JPanel implements KeyListener {
                 if (bullet.detectCollision(alien)) {
                     bulletsToRemove.add(bullet);
                     alien.getHurts();
-                    score += 10;
                 }
                 if (alien.getHealth() <= 0) {
+                    //Zad pp7
+                    score += gamemode==0?1:alien.getMaxHealth()/2;
                     aliensToRemove.add(alien);
                 }
             }
@@ -131,8 +170,12 @@ class GamePanel extends JPanel implements KeyListener {
 
         for(Alien alien : alienSpawner.getAliens()) {
             if(alien.detectCollision(player)) {
-                player.getHurts();
-                aliensToRemove.add(alien);
+                if(gamemode==0)
+                    gameOver();
+                else {
+                    player.getHurts();
+                    aliensToRemove.add(alien);
+                }
             }
             if(alien.getX() > 800 || alien.getY() > 800) {
                 aliensToRemove.add(alien);
@@ -149,13 +192,36 @@ class GamePanel extends JPanel implements KeyListener {
     }
 
     private void gameOver() {
-        JOptionPane.showMessageDialog(this, "Game Over! Your score: " + score);
-        gameTimer.stop();
-        alienSpawnTimer.stop();
-        gameFrame.setVisible(false);
-        gameFrame.dispose();
-        new Menu();
-
+    JOptionPane.showMessageDialog(this, "Game Over! Your score: " + score);
+    gameTimer.stop();
+    alienSpawnTimer.stop();
+    gameFrame.setVisible(false);
+    gameFrame.dispose();
+    new Menu();
+    //Zad pp10
+    Path path = Paths.get("scores.txt");
+    try {
+        List<String> lines = new ArrayList<>();
+        if (Files.exists(path)) {
+            lines = Files.readAllLines(path);
+            boolean found = false;
+            for (int i = 0; i < lines.size(); i++) {
+                if (lines.get(i).startsWith("Nickname: " + player.getNickname())) {
+                    lines.set(i, "Nickname: " + player.getNickname() + ", Score: " + score);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                lines.add("Nickname: " + player.getNickname() + ", Score: " + score);
+            }
+        } else {
+            lines.add("Nickname: " + player.getNickname() + ", Score: " + score);
+        }
+        Files.write(path, lines, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
     }
 
     public void createStars() {
@@ -189,7 +255,7 @@ class GamePanel extends JPanel implements KeyListener {
             }
             g.fillOval(star.x, star.y, 2, 2);
         }
-
+        //Zad pp8
         g.drawString("Score: " + score, 10, 20);
         player.draw(g);
         for (Alien alien : alienSpawner.getAliens()) {
@@ -198,9 +264,6 @@ class GamePanel extends JPanel implements KeyListener {
         for (Bullet bullet : player.getBullets()) {
             bullet.draw(g);
         }
-
-        g.setColor(Color.WHITE);
-        g.drawString("Cursor X: " + cursorX + ", Y: " + cursorY, 10, 30);
     }
 
     @Override

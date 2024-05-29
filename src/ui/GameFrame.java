@@ -3,15 +3,49 @@ package ui;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class GameFrame extends JFrame {
     private GamePanel gamePanel;
     private JMenuBar menuBar;
     private JMenuItem rules, icon, pause, replay;
+    private int minscore=0;
 
-    public GameFrame() {
+    public GameFrame(int difficulty, int delay, int maxwaves) {
+        //Zad pp9
         String nickname = JOptionPane.showInputDialog("Enter your nickname:");
-        gamePanel = new GamePanel(nickname, this);
+        int gamemode = JOptionPane.showInternalOptionDialog(null, "Choose your gamemode", "Gamemode",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Classic", "Arcade"},"Classic");
+
+        Path path = Paths.get("scores.txt");
+        if (Files.exists(path)) {
+            try {
+                List<String> lines = Files.readAllLines(path);
+                List<Integer> scores = new ArrayList<>();
+                for (String line : lines) {
+                    String[] parts = line.split(", ");
+                    int score = Integer.parseInt(parts[1].substring(7));
+                    scores.add(score);
+                }
+                if (!scores.isEmpty()) {
+                    minscore = Collections.min(scores);
+                }
+                else {
+                    minscore = 0;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        gamePanel = new GamePanel(nickname, this, gamemode,
+                difficulty, delay, maxwaves, minscore);
         add(gamePanel);
         setTitle("Space Invaders");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -58,6 +92,34 @@ public class GameFrame extends JFrame {
                 gamePanel.replayGame();
             }
         });
+
+        JButton top10Button = new JButton("Top 10");
+        top10Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Path path = Paths.get("scores.txt");
+                try {
+                    List<String> lines = Files.readAllLines(path);
+                    List<String> scores = new ArrayList<>();
+                    for (String line : lines) {
+                        String[] parts = line.split(", ");
+                        String nickname = parts[0].substring(10);
+                        int score = Integer.parseInt(parts[1].substring(7));
+                        scores.add(nickname + ": " + score);
+                    }
+                    scores.sort(Collections.reverseOrder());
+                    minscore = Integer.parseInt(scores.get(9).split(": ")[1]);
+                    StringBuilder top10 = new StringBuilder();
+                    for (int i = 0; i < Math.min(10, scores.size()); i++) {
+                        top10.append((i + 1) + ". " + scores.get(i) + "\n");
+                    }
+                    JOptionPane.showMessageDialog(null, top10.toString(), "Top 10 Players", JOptionPane.INFORMATION_MESSAGE);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        menuBar.add(top10Button);
 
         menuBar.add(rules);
         menuBar.add(icon);
