@@ -87,14 +87,18 @@ public void draw(Graphics g) {
 
     @Override
     public void moveLeft(){
-        x -= vel;
-        updateBoundingRectangle();
+        if (x - getBounds().width > 0) {
+            x -= vel;
+            updateBoundingRectangle();
+        }
     }
 
     @Override
     public void moveRight(){
-        x += vel;
-        updateBoundingRectangle();
+        if(x + getBounds().width < 800 - getBounds().width) {
+            x += vel;
+            updateBoundingRectangle();
+        }
     }
 }
 

@@ -1,6 +1,7 @@
 package objects;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -16,6 +17,8 @@ public class Entity {
     protected double angle;
     protected BufferedImage texture;
     private ArrayList<Component> components;
+    protected Timer movementTimer;
+    boolean moveRL = false;
     protected Rectangle boundingRectangle;
 
     public Entity(int x, int y, int initVel, ArrayList<Component> components, Point delta) {
@@ -80,27 +83,35 @@ public class Entity {
     }
 
     public void moveLeft() {
-        x -= vel;
-        angle = Math.toRadians(-90);
-        updateBoundingRectangle();
+        if (x - getBounds().width > 0) {
+            x -= vel;
+            angle = Math.toRadians(-90);
+            updateBoundingRectangle();
+        }
     }
 
     public void moveRight() {
-        x += vel;
-        angle = Math.toRadians(90);
-        updateBoundingRectangle();
+        if (x + getBounds().width < 800) {
+            x += vel;
+            angle = Math.toRadians(90);
+            updateBoundingRectangle();
+        }
     }
 
     public void moveUp() {
-        y -= vel;
-        angle = 0.0;
-        updateBoundingRectangle();
+        if (y>0) {
+            y -= vel;
+            angle = 0.0;
+            updateBoundingRectangle();
+        }
     }
 
     public void moveDown() {
-        y += vel;
-        angle = Math.toRadians(180);
-        updateBoundingRectangle();
+        if (y + texture.getHeight() < 800) {
+            y += vel;
+            angle = Math.toRadians(180);
+            updateBoundingRectangle();
+        }
     }
 
     public void Left(){
@@ -114,8 +125,13 @@ public class Entity {
     }
 
     public void Up(){
-        x += vel * Math.cos(angle - Math.PI /2);
-        y += vel * Math.sin(angle - Math.PI /2);
+
+        double dx = x+ vel * Math.cos(angle - Math.PI /2);
+        double dy = y + vel * Math.sin(angle - Math.PI /2);
+        if(dx>0 && dx<800 && dy>0 && dy<800){
+            x = (int)dx;
+            y = (int)dy;
+        }
         updateBoundingRectangle();
     }
 

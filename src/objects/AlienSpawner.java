@@ -3,6 +3,7 @@ package objects;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import javax.swing.*;
 
 
 
@@ -21,14 +22,43 @@ public class AlienSpawner{
     }
 
     private Alien spawnAlien(String type, int x, int y, int stats, boolean sentient){
+        if(gm==0)
+        return new Alien(x, y, entity -> {
+
+            entity.movementTimer = new Timer(500, e -> {
+                entity.moveRL = !entity.moveRL;
+            });
+            entity.movementTimer.start();
+            if(entity.moveRL)
+                entity.moveRight();
+            else
+                entity.moveLeft();
+            entity.moveDown();
+        }, new ArrayList<>(Arrays.asList(
+                new Component(
+                        "res/alien/lvl1/"+type+"/body.png", Map.of(
+                        "health", 10,
+                        "speed", 0,
+                        "agility", 1,
+                        "attack", 20)),
+                new Component(
+                        "res/alien/lvl1/"+type+"/wing.png", Map.of(
+                        "health", 10,
+                        "speed", 1,
+                        "agility", 1,
+                        "attack", 20))
+        )), false);
 
         Alien result = new Alien(x, y, entity -> {
-            System.out.println(entity.getX() + " " + x);
-            if (entity.getX() >  x+50) {
-                entity.moveLeft();
-            } else if (entity.getX() < x-50) {
+
+            entity.movementTimer = new Timer(1000, e -> {
+                entity.moveRL = !entity.moveRL;
+            });
+            entity.movementTimer.start();
+            if(entity.moveRL)
                 entity.moveRight();
-            }
+            else
+                entity.moveLeft();
             entity.moveDown();
         }, new ArrayList<>(Arrays.asList(
             new Component(
@@ -74,7 +104,7 @@ public class AlienSpawner{
         }
 
         System.out.println("Spawning wave of "+numAliens+" aliens");
-        for (int i = 0; i < numAliens+1; i++) {
+        for (int i = 0; i < numAliens*2; i++) {
 
             aliens.add(spawnAlien(type, 800/numAliens * i, 0, stat, sentient));
             if(gm==1)

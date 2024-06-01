@@ -169,11 +169,21 @@ class GamePanel extends JPanel implements KeyListener {
                     alien.move();
             });
         }
-        player.getBullets().forEach(Bullet::move);
+
+        List<Bullet> bulletsToRemove = new ArrayList<>();
+
+        if(!player.getBullets().isEmpty())
+        player.getBullets().stream().forEach(bullet -> {
+            bullet.move();
+            if (bullet.getX() > 800 || bullet.getY() > 800) {
+                bulletsToRemove.add(bullet);
+            }
+        });
+
         if(!alienSpawner.getAliens().isEmpty())
         alienSpawner.getAliens().get(0).bullets.forEach(Bullet::move);
 
-        List<Bullet> bulletsToRemove = new ArrayList<>();
+
         List<Alien> aliensToRemove = new ArrayList<>();
         for (Bullet bullet : player.getBullets()) {
             for (Alien alien : alienSpawner.getAliens()) {
@@ -188,15 +198,12 @@ class GamePanel extends JPanel implements KeyListener {
                 }
             }
         }
+
         if(!alienSpawner.getAliens().isEmpty())
         for(Bullet bullet : alienSpawner.getAliens().get(0).bullets) {
             if(bullet.detectCollision(player)) {
-                if(gamemode==0)
-                    gameOver();
-                else {
                     bullet.Attack(player);
                     bulletsToRemove.add(bullet);
-                }
             }
         }
 

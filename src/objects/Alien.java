@@ -16,6 +16,7 @@ public class Alien extends Entity {
 
     protected Move move;
     protected boolean sentient = false;
+
     static public ArrayList<Bullet> bullets = new ArrayList<>();
 
     public Alien(int x, int y, Move moveOperation, ArrayList<Component> components, boolean sentient) {
@@ -50,21 +51,20 @@ public class Alien extends Entity {
     int dx = target.getX() - this.getX();
     int dy = target.getY() - this.getY();
 
-    // Calculate the angle to the target
     double angleToTarget = Math.atan2(dy, dx);
 
+        if (dx > 0) {
+            moveRight();
+        } else if (dx < 0) {
+            moveLeft();
+        }
 
-    if (dx > 0) {
-        moveRight();
-    } else if (dx < 0) {
-        moveLeft();
-    }
+        if (dy > 0) {
+            moveDown();
+        } else if (dy < 0) {
+            moveUp();
+        }
 
-    if (dy > 0) {
-        moveDown();
-    } else if (dy < 0) {
-        moveUp();
-    }
         this.angle = angleToTarget + Math.PI / 2;
 }
 
