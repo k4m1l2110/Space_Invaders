@@ -22,14 +22,14 @@ public class Player extends Entity {
                 new Component(
                         "res/player/lvl1/basic/wing.png", Map.of(
                         "health", 50,
-                        "speed", 3,
-                        "agility", 3,
+                        "speed", 5,
+                        "agility", 5,
                         "attack", 10)),
                 new Component(
                         "res/player/lvl1/basic/body.png", Map.of(
                         "health", 50,
-                        "speed", 3,
-                        "agility", 3,
+                        "speed", 5,
+                        "agility", 5,
                         "attack", 10))
 
         )), new Point(0, 0));

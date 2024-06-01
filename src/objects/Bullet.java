@@ -14,7 +14,7 @@ public class Bullet extends Entity{
                                 "health", 50,
                                 "speed", 3,
                                 "agility", 10,
-                                "attack", 2))
+                                "attack", 1))
 
                 ))
                 , new Point(0, -1));

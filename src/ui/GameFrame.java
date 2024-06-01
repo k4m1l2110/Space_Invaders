@@ -93,6 +93,7 @@ public class GameFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 gamePanel.replayGame();
+                new GameFrame(difficulty, delay, maxwaves);
             }
         });
 

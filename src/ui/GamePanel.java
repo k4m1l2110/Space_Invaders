@@ -319,7 +319,10 @@ class GamePanel extends JPanel implements KeyListener {
         //TODO
     }
     public void replayGame() {
-        //TODO
+        gameTimer.stop();
+        alienSpawnTimer.stop();
+        gameFrame.setVisible(false);
+        gameFrame.dispose();;
     }
 
     private boolean isPaused = false;

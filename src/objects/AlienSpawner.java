@@ -23,12 +23,13 @@ public class AlienSpawner{
     private Alien spawnAlien(String type, int x, int y, int stats, boolean sentient){
 
         Alien result = new Alien(x, y, entity -> {
+            System.out.println(entity.getX() + " " + x);
+            if (entity.getX() >  x+50) {
+                entity.moveLeft();
+            } else if (entity.getX() < x-50) {
+                entity.moveRight();
+            }
             entity.moveDown();
-            entity.moveRight();
-            entity.moveRight();
-            entity.moveDown();
-            entity.moveLeft();
-            entity.moveLeft();
         }, new ArrayList<>(Arrays.asList(
             new Component(
                 "res/alien/lvl1/"+type+"/body.png", Map.of(
@@ -56,7 +57,8 @@ public class AlienSpawner{
 
         String type="basic";
         int stat= getRandomNumber(10, 20);
-        boolean sentient = getRandomNumber(0, 1)==0;
+        boolean sentient = gm==1?(getRandomNumber(0, 1)==0):false;
+
         switch(getRandomNumber(0, 3)){
             case 0:
                 type="basic";
@@ -75,6 +77,7 @@ public class AlienSpawner{
         for (int i = 0; i < numAliens+1; i++) {
 
             aliens.add(spawnAlien(type, 800/numAliens * i, 0, stat, sentient));
+            if(gm==1)
             aliens.get(aliens.size()-1).shootDelayTimer.start();
 
         }
