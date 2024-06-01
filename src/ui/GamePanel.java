@@ -158,17 +158,14 @@ class GamePanel extends JPanel implements KeyListener {
         if ( keysPressed.contains(KeyEvent.VK_SPACE) ) {
             player.shoot();
         }
-        if(gamemode==0)
-            alienSpawner.getAliens().forEach(alien -> alien.move());
-        else {
-            alienSpawner.getAliens().forEach(alien -> {
-                if(alien.isSentient()) {
+
+            alienSpawner.getAliens().stream().forEach(alien -> {
+                if(alien.isSentient()&&gamemode==1) {
                     alien.move(player);
                 }
                 else
                     alien.move();
             });
-        }
 
         List<Bullet> bulletsToRemove = new ArrayList<>();
 
@@ -181,8 +178,12 @@ class GamePanel extends JPanel implements KeyListener {
         });
 
         if(!alienSpawner.getAliens().isEmpty())
-        alienSpawner.getAliens().get(0).bullets.forEach(Bullet::move);
-
+        alienSpawner.getAliens().get(0).bullets.stream().forEach(bullet -> {
+            bullet.move();
+            if (bullet.getX() > 800 || bullet.getY() > 800) {
+                bulletsToRemove.add(bullet);
+            }
+        });
 
         List<Alien> aliensToRemove = new ArrayList<>();
         for (Bullet bullet : player.getBullets()) {

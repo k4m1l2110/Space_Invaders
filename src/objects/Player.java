@@ -84,7 +84,6 @@ public void draw(Graphics g) {
 
 }
 
-
     @Override
     public void moveLeft(){
         if (x - getBounds().width > 0) {

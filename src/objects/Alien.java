@@ -48,6 +48,7 @@ public class Alien extends Entity {
     }
 
     public void moveTowards(Entity target) {
+
     int dx = target.getX() - this.getX();
     int dy = target.getY() - this.getY();
 
