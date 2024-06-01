@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class Entity {
     protected int x, y, vel;
-    int health, maxHealth = 10, agility;
+    int health, maxHealth = 10, agility, damage=1;
     protected double angle;
     protected BufferedImage texture;
     private ArrayList<Component> components;
@@ -40,6 +40,7 @@ public class Entity {
             maxHealth+=component.stats.get("health");
             vel+=component.stats.get("speed");
             agility+=component.stats.get("agility");
+            damage+=component.stats.get("attack");
             maxWidth = Math.max(maxWidth, texture.getWidth(null));
             maxHeight = Math.max(maxHeight, texture.getHeight(null));
         }
@@ -102,6 +103,28 @@ public class Entity {
         updateBoundingRectangle();
     }
 
+    public void Left(){
+        angle -= Math.toRadians(agility);
+        updateBoundingRectangle();
+    }
+
+    public void Right(){
+        angle += Math.toRadians(agility);
+        updateBoundingRectangle();
+    }
+
+    public void Up(){
+        x += vel * Math.cos(angle - Math.PI /2);
+        y += vel * Math.sin(angle - Math.PI /2);
+        updateBoundingRectangle();
+    }
+
+    public void Down(){
+        x -= vel * Math.cos(angle - Math.PI /2);
+        y -= vel * Math.sin(angle - Math.PI /2);
+        updateBoundingRectangle();
+    }
+
     protected void updateBoundingRectangle() {
         boundingRectangle.setLocation(x+(texture.getWidth()-boundingRectangle.width)/2, y+(texture.getHeight()-boundingRectangle.height)/2);
     }
@@ -146,4 +169,11 @@ public class Entity {
         return y;
     }
 
+    public void Hurt(int damage) {
+        health -= damage;
+    }
+
+    public void Attack(Entity target){
+        target.Hurt(damage);
+    }
 }

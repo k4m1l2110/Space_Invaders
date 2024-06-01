@@ -20,19 +20,17 @@ public class Player extends Entity {
     public Player(String nickname, int x, int y, int initVel) {
         super(x, y, initVel, new ArrayList<>(Arrays.asList(
                 new Component(
-                        "res/player/lvl1/basic/body.png", Map.of(
-                        "health", 20,
-                        "armor", 0,
-                        "speed", 2,
-                        "agility", 5,
-                        "strength", 5)),
-                new Component(
                         "res/player/lvl1/basic/wing.png", Map.of(
-                        "health", 20,
-                        "armor", 0,
-                        "speed", 2,
-                        "agility", 5,
-                        "strength", 5))
+                        "health", 50,
+                        "speed", 3,
+                        "agility", 3,
+                        "attack", 10)),
+                new Component(
+                        "res/player/lvl1/basic/body.png", Map.of(
+                        "health", 50,
+                        "speed", 3,
+                        "agility", 3,
+                        "attack", 10))
 
         )), new Point(0, 0));
         this.nickname = nickname;
@@ -66,10 +64,6 @@ public class Player extends Entity {
         return new Rectangle(x, y, 10, 10);
     }
 
-    public void getHurts() {
-        health -= 10;
-    }
-
     public int getHealth() {
         return health;
     }
@@ -101,28 +95,6 @@ public void draw(Graphics g) {
     public void moveRight(){
         x += vel;
         updateBoundingRectangle();
-    }
-
-    public void Left(){
-        angle -= Math.toRadians(agility);
-        super.updateBoundingRectangle();
-    }
-
-    public void Right(){
-        angle += Math.toRadians(agility);
-        super.updateBoundingRectangle();
-    }
-
-    public void Up(){
-        x += vel * Math.cos(angle - Math.PI /2);
-        y += vel * Math.sin(angle - Math.PI /2);
-        super.updateBoundingRectangle();
-    }
-
-    public void Down(){
-        x -= vel * Math.cos(angle - Math.PI /2);
-        y -= vel * Math.sin(angle - Math.PI /2);
-        super.updateBoundingRectangle();
     }
 }
 

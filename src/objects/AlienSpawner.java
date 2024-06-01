@@ -20,7 +20,7 @@ public class AlienSpawner{
         this.difficultyLevel = difficulty;
     }
 
-    private Alien spawnAlien(String type, int x, int y) {
+    private Alien spawnAlien(String type, int x, int y, int stats, boolean sentient){
 
         Alien result = new Alien(x, y, entity -> {
             entity.moveDown();
@@ -32,19 +32,17 @@ public class AlienSpawner{
         }, new ArrayList<>(Arrays.asList(
             new Component(
                 "res/alien/lvl1/"+type+"/body.png", Map.of(
-                "health", 20,
-                "armor", 0,
-                "speed", 1,
-                "agility", 5,
-                "strength", 5)),
+                "health", type=="health"?20+stats:10+stats,
+                    "speed", type=="speed"?2+stats/10:1+stats/10,
+                    "agility", type=="speed"?2+stats/10:1+stats/10,
+                    "attack", type=="damage"?10+stats:5+stats)),
             new Component(
                 "res/alien/lvl1/"+type+"/wing.png", Map.of(
-                "health", 20,
-                "armor", 0,
-                "speed", 1,
-                "agility", 5,
-                "strength", 5))
-        )), true);
+                    "health", type=="health"?20+stats:10+stats,
+                "speed", type=="speed"?2+stats/10:1+stats/10,
+                    "agility", type=="speed"?2+stats/10:1+stats/10,
+                "attack", type=="damage"?10+stats:5+stats))
+        )), sentient);
 
         return result;
     }
@@ -55,26 +53,29 @@ public class AlienSpawner{
 
         //Zad pp4
         int numAliens = (getRandomNumber(1,score/1000 +2)) *difficultyLevel;
+
+        String type="basic";
+        int stat= getRandomNumber(10, 20);
+        boolean sentient = getRandomNumber(0, 1)==0;
+        switch(getRandomNumber(0, 3)){
+            case 0:
+                type="basic";
+                break;
+            case 1:
+                type="health";
+                break;
+            case 2:
+                type="damage";
+                break;
+            default:
+                break;
+        }
+
         System.out.println("Spawning wave of "+numAliens+" aliens");
         for (int i = 0; i < numAliens+1; i++) {
 
-            String type="basic";
-
-            switch(getRandomNumber(0, 3)){
-                case 0:
-                    type="basic";
-                    break;
-                case 1:
-                    type="health";
-                    break;
-                case 2:
-                    type="damage";
-                    break;
-                default:
-                    break;
-            }
-
-            aliens.add(spawnAlien(type, 800/numAliens * i, 0));
+            aliens.add(spawnAlien(type, 800/numAliens * i, 0, stat, sentient));
+            aliens.get(aliens.size()-1).shootDelayTimer.start();
 
         }
 

@@ -25,6 +25,7 @@ class GamePanel extends JPanel implements KeyListener {
     private GameFrame gameFrame;
     private int gamemode, difficulty=1, delay =1, maxwaves=1, minscore;
     private int cursorX = 0, cursorY = 0, difficultyLevel = 8, score = 0;
+    private boolean messageShown = false;
     ArrayList<Component> components = new ArrayList<>();
 
     public GamePanel(String nickname, GameFrame gameFrame,
@@ -77,7 +78,7 @@ class GamePanel extends JPanel implements KeyListener {
         alienSpawnTimer.start();
 
         JButton moveLeftButton = new JButton("Move Left");
-        //Zad pp1
+        moveLeftButton.setFocusable(false);
         moveLeftButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -86,6 +87,7 @@ class GamePanel extends JPanel implements KeyListener {
         });
 
         JButton moveRightButton = new JButton("Move Right");
+        moveRightButton.setFocusable(false);
         moveRightButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -93,8 +95,8 @@ class GamePanel extends JPanel implements KeyListener {
             }
         });
 
-        //Zad pp2
         JButton shootButton = new JButton("Shoot");
+        shootButton.setFocusable(false);
         shootButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -107,37 +109,48 @@ class GamePanel extends JPanel implements KeyListener {
         add(shootButton);
     }
 
-    void spawnWave(){
-
-    }
-
     private void updateGameState() {
 
-//        if(score>minscore)
-//            JOptionPane.showMessageDialog(this, "Congratulations! Your score is in the top 10!");
-//
+        if(score>minscore&&!messageShown) {
+            messageShown = true;
+            JOptionPane.showMessageDialog(this, "Congratulations! Your score is in the top 10!");
+
+        }
+
         //Zad pp1
         if ( keysPressed.contains(KeyEvent.VK_LEFT) ) {
             if(gamemode==1)
-                player.Left();
+                if(keysPressed.contains(KeyEvent.VK_SHIFT))
+                    player.moveLeft();
+                else
+                    player.Left();
             else
                 player.moveLeft();
         }
         if ( keysPressed.contains(KeyEvent.VK_RIGHT) ) {
             if(gamemode==1)
-                player.Right();
+                if(keysPressed.contains(KeyEvent.VK_SHIFT))
+                    player.moveRight();
+                else
+                    player.Right();
             else
                 player.moveRight();
         }
         if ( keysPressed.contains(KeyEvent.VK_UP) ) {
             if(gamemode==1)
-                player.Up();
+                if(keysPressed.contains(KeyEvent.VK_SHIFT))
+                    player.moveUp();
+                else
+                    player.Up();
             else
                 player.moveUp();
         }
         if ( keysPressed.contains(KeyEvent.VK_DOWN) ) {
             if(gamemode==1)
-                player.Down();
+                if(keysPressed.contains(KeyEvent.VK_SHIFT))
+                    player.moveDown();
+                else
+                    player.Down();
             else
                 player.moveDown();
         }
@@ -148,9 +161,17 @@ class GamePanel extends JPanel implements KeyListener {
         if(gamemode==0)
             alienSpawner.getAliens().forEach(alien -> alien.move());
         else {
-            alienSpawner.getAliens().forEach(alien -> alien.move());
+            alienSpawner.getAliens().forEach(alien -> {
+                if(alien.isSentient()) {
+                    alien.move(player);
+                }
+                else
+                    alien.move();
+            });
         }
         player.getBullets().forEach(Bullet::move);
+        if(!alienSpawner.getAliens().isEmpty())
+        alienSpawner.getAliens().get(0).bullets.forEach(Bullet::move);
 
         List<Bullet> bulletsToRemove = new ArrayList<>();
         List<Alien> aliensToRemove = new ArrayList<>();
@@ -158,12 +179,23 @@ class GamePanel extends JPanel implements KeyListener {
             for (Alien alien : alienSpawner.getAliens()) {
                 if (bullet.detectCollision(alien)) {
                     bulletsToRemove.add(bullet);
-                    alien.getHurts();
+                    player.Attack(alien);
                 }
                 if (alien.getHealth() <= 0) {
                     //Zad pp7
                     score += gamemode==0?1:alien.getMaxHealth()/2;
                     aliensToRemove.add(alien);
+                }
+            }
+        }
+        if(!alienSpawner.getAliens().isEmpty())
+        for(Bullet bullet : alienSpawner.getAliens().get(0).bullets) {
+            if(bullet.detectCollision(player)) {
+                if(gamemode==0)
+                    gameOver();
+                else {
+                    bullet.Attack(player);
+                    bulletsToRemove.add(bullet);
                 }
             }
         }
@@ -173,7 +205,7 @@ class GamePanel extends JPanel implements KeyListener {
                 if(gamemode==0)
                     gameOver();
                 else {
-                    player.getHurts();
+                    alien.Attack(player);
                     aliensToRemove.add(alien);
                 }
             }
@@ -264,6 +296,10 @@ class GamePanel extends JPanel implements KeyListener {
         for (Bullet bullet : player.getBullets()) {
             bullet.draw(g);
         }
+        if(!alienSpawner.getAliens().isEmpty())
+        for(Bullet bullet : alienSpawner.getAliens().get(0).bullets) {
+            bullet.draw(g);
+        }
     }
 
     @Override
@@ -282,12 +318,20 @@ class GamePanel extends JPanel implements KeyListener {
     public void setPlayerIcon(String icon) {
         //TODO
     }
-
-    public void pauseGame() {
-        //TODO
-    }
-
     public void replayGame() {
         //TODO
     }
+
+    private boolean isPaused = false;
+
+    public void pauseGame() {
+    isPaused = !isPaused;
+    if (isPaused) {
+        gameTimer.stop();
+        alienSpawnTimer.stop();
+    } else {
+        gameTimer.start();
+        alienSpawnTimer.start();
+    }
+}
 }

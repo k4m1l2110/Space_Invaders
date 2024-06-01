@@ -21,7 +21,7 @@ public class GameFrame extends JFrame {
         //Zad pp9
         String nickname = JOptionPane.showInputDialog("Enter your nickname:");
         int gamemode = JOptionPane.showInternalOptionDialog(null, "Choose your gamemode", "Gamemode",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Classic", "Arcade"},"Classic");
+                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{"Classic", "Extended"},"Classic");
 
         Path path = Paths.get("scores.txt");
         if (Files.exists(path)) {
@@ -58,6 +58,7 @@ public class GameFrame extends JFrame {
         pause = new JMenuItem("Pause");
         replay = new JMenuItem("Replay");
 
+        icon.setFocusable(false);
         rules.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -79,6 +80,7 @@ public class GameFrame extends JFrame {
             }
         });
 
+        pause.setFocusable(false);
         pause.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -86,6 +88,7 @@ public class GameFrame extends JFrame {
             }
         });
 
+        replay.setFocusable(false);
         replay.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -94,6 +97,7 @@ public class GameFrame extends JFrame {
         });
 
         JButton top10Button = new JButton("Top 10");
+        top10Button.setFocusable(false);
         top10Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

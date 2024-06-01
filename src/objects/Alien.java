@@ -1,6 +1,9 @@
 package objects;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 
@@ -13,11 +16,26 @@ public class Alien extends Entity {
 
     protected Move move;
     protected boolean sentient = false;
+    static public ArrayList<Bullet> bullets = new ArrayList<>();
 
     public Alien(int x, int y, Move moveOperation, ArrayList<Component> components, boolean sentient) {
         super(x, y, 1 ,components, new Point(0, 1));
         this.move=moveOperation;
         this.sentient = sentient;
+    }
+
+    private boolean canShoot = true;
+
+    public Timer shootDelayTimer = new Timer(1000, new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            shoot();
+        }
+    });
+
+    public void shoot() {
+            Bullet bullet = new Bullet(x, y, 10, angle);
+            bullets.add(bullet);
     }
 
     public void move() {
@@ -29,24 +47,29 @@ public class Alien extends Entity {
     }
 
     public void moveTowards(Entity target) {
-        int dx = target.getX() - this.getX();
-        int dy = target.getY() - this.getY();
+    int dx = target.getX() - this.getX();
+    int dy = target.getY() - this.getY();
 
-        if (dx > 0) {
-            moveRight();
-        } else if (dx < 0) {
-            moveLeft();
-        }
+    // Calculate the angle to the target
+    double angleToTarget = Math.atan2(dy, dx);
 
-        if (dy > 0) {
-            moveDown();
-        } else if (dy < 0) {
-            moveUp();
-        }
+
+    if (dx > 0) {
+        moveRight();
+    } else if (dx < 0) {
+        moveLeft();
     }
 
-    public void getHurts() {
-        health -= 10;
+    if (dy > 0) {
+        moveDown();
+    } else if (dy < 0) {
+        moveUp();
+    }
+        this.angle = angleToTarget + Math.PI / 2;
+}
+
+    public boolean isSentient() {
+        return sentient;
     }
 
     public int getHealth() {
